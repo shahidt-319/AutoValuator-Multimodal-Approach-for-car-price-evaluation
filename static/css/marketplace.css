@@ -1,0 +1,136 @@
+body {
+  background: linear-gradient(115deg, #e0ecfc 0%, #f5faff 100%);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.navbar {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(3,36,108,0.08);
+}
+
+.navbar-brand {
+  color: #0a55be;
+  font-weight: 800;
+  font-size: 1.4rem;
+  letter-spacing: .5px;
+}
+
+.card {
+  border-radius: 18px;
+  border: none;
+  box-shadow: 0 4px 18px rgba(9, 86, 182, 0.07);
+  transition: 0.24s;
+  background: #f9fcfe;
+}
+
+.card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 14px 34px rgba(44, 110, 255, 0.13);
+}
+
+.listing-img {
+  height: 210px;
+  object-fit: cover;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+}
+
+.filter-box {
+  background: #ffffff;
+  border-radius: 13px;
+  padding: 24px;
+  margin-bottom: 38px;
+  box-shadow: 0 3px 16px rgba(9,109,195,0.04);
+}
+
+footer {
+  text-align: center;
+  padding: 18px 0 24px 0;
+  color: #8092a1;
+  background: linear-gradient(90deg,#f0f5fc 40%,#eaf6fc 100%);
+  margin-top: 54px;
+  border-top: 1px solid #e3eafa;
+  font-size: 1.09rem;
+}
+
+.no-results {
+  font-size: 1.2rem;
+  color: #a1b1c4;
+  padding: 54px 0;
+  letter-spacing:.4px;
+}
+
+.audio-player {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 10px;
+}
+
+/* ---- Tubular Table Card --- */
+.price-tube-card {
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  background: linear-gradient(90deg,#e3f3ff 0%,#e4ffd5 100%);
+  border-radius: 1.2em;
+  box-shadow: 0 2px 12px #cdf3eb63;
+  margin-bottom: 8px;
+}
+
+.tube {
+  flex: 1; 
+  text-align: center;
+  padding: 12px 4px 14px 4px;
+  margin: 2px 6px 2px 6px;
+}
+.tube-label {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1346b5;
+  margin-bottom: 4px;
+}
+.tube-price {
+  font-size: 1.27rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #19c37d;
+  background: #f3fff3;
+  border-radius: 10px;
+  display: inline-block;
+  padding: 3px 16px;
+}
+
+.vs-circle-card {
+  background: linear-gradient(135deg,#13bfcf 0%,#48e07c 100%);
+  color: #fff;
+  font-weight: 900;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  width: 38px; 
+  height: 38px;
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  margin: 0 10px;
+  box-shadow: 0 0 10px #00ffc855;
+}
+
+.car-year {
+  font-weight: 500;
+  font-size: 0.98rem;
+  color: #789;
+  background: #e2edf9;
+  border-radius: 6px;
+  padding: 2px 12px;
+  margin-left: 8px;
+}
+
+.listing-desc {
+  margin-top: 7px;
+  margin-bottom: 10px;
+  font-size: 1.06rem;
+  color: #3c4959;
+}
+
+.seller-label { color: #888; font-size: 1rem;}
+.seller-price { color: #1778c3; font-weight:600; font-size: 1.17rem;}

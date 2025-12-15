@@ -1,0 +1,111 @@
+body {
+  background-color: #e6f0ff;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.navbar {
+  background-color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.header, .admin-title {
+  text-align: center;
+  padding: 50px 20px;
+  background-color: #fefefe;
+  border-bottom: 1px solid #ddd;
+}
+
+.admin-title {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: #0056b3;
+}
+
+.card, .admin-section, .admin-table {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transition: 0.3s;
+  background: #fff;
+}
+
+.card:hover, .admin-section:hover, .admin-table:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.btn-primary, .btn-admin-delete {
+  background-color: #007bff;
+  border: none;
+}
+
+.btn-primary:hover, .btn-admin-delete:hover {
+  background-color: #0056b3;
+}
+
+.btn-admin-delete {
+  color: #fff;
+  font-weight: 700;
+  border-radius: 5px;
+  font-size: .96em;
+  margin-left: 2px;
+}
+
+.admin-section {
+  margin: 30px auto 16px auto;
+  padding: 30px 35px;
+}
+.admin-table {
+  width: 100%;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.admin-table th {
+  background-color: #f7fbff;
+  color: #007bff;
+  font-weight: bold;
+  border-top: none;
+  border-bottom: 1px solid #ebecec;
+}
+.admin-table td, .admin-table th {
+  border-top: 1px solid #e8e8e8 !important;
+  vertical-align: middle;
+}
+.car-admin-img {
+  width: 90px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 2px 7px #aaa2;
+}
+.car-admin-noimg {
+  width: 90px;
+  height: 64px;
+  border-radius: 10px;
+  background: #f1f1f1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 1rem;
+}
+footer {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  background: #f0f4fa;
+  margin-top: 50px;
+}
+.badge-admin {
+  background: #007bff;
+  color: #fff;
+  padding: .45em 1em;
+  border-radius: 8px;
+  font-size: .99em;
+}

@@ -1,0 +1,35 @@
+body {
+  background-color: #f4f9ff;
+  font-family: 'Segoe UI', sans-serif;
+}
+.navbar {
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.navbar-brand {
+  font-weight: bold;
+  color: #007bff;
+}
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+.btn-remove {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+}
+.btn-remove:hover {
+  background-color: #c82333;
+}
+.empty-msg {
+  font-size: 1.2rem;
+  text-align: center;
+  color: #666;
+  margin-top: 50px;
+}
