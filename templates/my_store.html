@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Store - Autovaluator: Multimodal Approach</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='css/my_store.css') }}" rel="stylesheet" />
+  <style>
+    .market-img-large {
+      width: 100%;
+      max-width: 210px;
+      height: 170px;
+      object-fit: cover;
+      border-radius: 13px;
+      box-shadow: 0 2px 16px #9bdbea33, 0 1px 4px #ddd;
+      margin-top: 18px;
+      margin-bottom: 10px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      background: #f6fafe;
+    }
+    .card-body {
+      padding-top: 0.7rem;
+    }
+    .btn-remove {
+      background: #df2a36;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 7px;
+    }
+    .btn-remove:hover {
+      background: #ab1823;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/dashboard">Autovaluator</a>
+      <div class="collapse navbar-collapse justify-content-end">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="/marketplace">Marketplace</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about">About Us</a></li>
+          <li class="nav-item"><a class="nav-link text-danger" href="/logout">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-5">
+    <h3 class="mb-4 text-primary">📦 My Store (Your Listed Cars)</h3>
+    {% if cars %}
+    <div class="row">
+      {% for car in cars %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="text-center">
+            <a href="/car/{{ car['id'] }}">
+              {% if car.worst_image %}
+                <img src="{{ url_for('static', filename='uploads/' ~ car.worst_image['photo']) }}"
+                     class="market-img-large"
+                     alt="Car Image">
+              {% else %}
+                <img src="{{ url_for('static', filename='uploads/default.jpg') }}"
+                     class="market-img-large" alt="No image">
+              {% endif %}
+            </a>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">{{ car['car_name'] or 'N/A' }} - {{ car['year'] or 'N/A' }}</h5>
+            <p class="card-text mb-2">
+              <strong>Fuel:</strong> {{ car['fuel'] or 'N/A' }}<br>
+              <strong>Transmission:</strong> {{ car['transmission'] or 'N/A' }}<br>
+              <strong>Seller Price:</strong> ₹{{ car['seller_price'] or 'N/A' }}
+            </p>
+            <form action="/remove-from-store/{{ car['id'] }}" method="POST">
+              <button type="submit" class="btn btn-remove btn-sm w-100">🗑️ Remove</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-msg">🚫 You haven't listed any cars yet.</div>
+    {% endif %}
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

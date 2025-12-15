@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>List Car - Upload Audio & Analyze</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="{{ url_for('static', filename='css/list_car.css') }}" rel="stylesheet" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #c6f0ff, #daf7e2);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .container {
+      max-width: 680px;
+      margin: 60px auto 80px;
+      padding: 40px 45px;
+      background: #ffffffdd;
+      border-radius: 18px;
+      box-shadow: 0 14px 40px rgba(20, 40, 85, 0.15);
+      backdrop-filter: saturate(180%) blur(9px);
+      text-align: center;
+    }
+    h3 {
+      font-weight: 700;
+      font-size: 2.3rem;
+      color: #1b3c8d;
+      margin-bottom: 35px;
+      letter-spacing: 0.7px;
+    }
+    label.form-label {
+      font-weight: 600;
+      font-size: 1.15rem;
+      color: #2c4a94;
+      text-align: left;
+      display: block;
+      margin-bottom: 8px;
+    }
+    input[type="file"], input[type="number"] {
+      border: 2.3px solid #a7c6ff;
+      border-radius: 12px;
+      font-size: 1.16rem;
+      padding: 10px 14px;
+      transition: border-color 0.4s ease, box-shadow 0.3s ease;
+      outline-offset: 2px;
+      cursor: pointer;
+    }
+    input[type="file"]:focus, input[type="number"]:focus {
+      border-color: #2458d6;
+      box-shadow: 0 0 15px #6088d9aa;
+    }
+    button#predictBtn {
+      width: 100%;
+      margin-top: 30px;
+      background: linear-gradient(90deg, #4b8cff 0%, #3bceaf 100%);
+      border: none;
+      padding: 14px 0;
+      border-radius: 50px;
+      color: white;
+      font-size: 1.32rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 28px rgba(61, 140, 252, 0.48);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+    button#predictBtn:hover {
+      background: linear-gradient(90deg, #3bceaf 0%, #4b8cff 100%);
+      box-shadow: 0 10px 34px rgba(45, 153, 183, 0.58);
+    }
+    #audioClips {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 2px solid #70caf6;
+      text-align: center;
+      display: none;
+    }
+    #audioClips h5 {
+      color: #1b3c8d;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    audio {
+      margin: 8px 0 22px 0;
+      width: 100%;
+      max-width: 540px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(30, 75, 158, 0.12);
+    }
+    a.btn-view-price {
+      display: none;
+      width: 100%;
+      margin-top: 25px;
+      background: linear-gradient(90deg, #3bb78f 0%, #0bab64 100%);
+      color: #fff !important;
+      font-size: 1.25rem;
+      font-weight: 700;
+      padding: 14px 0;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 6px 24px #08a763aa;
+      transition: background 0.3s ease;
+    }
+    a.btn-view-price:hover {
+      background: linear-gradient(90deg, #0bab64 0%, #3bb78f 100%);
+    }
+    .alert-warning {
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(255, 184, 77, 0.25);
+    }
+    .ai-label-bold { font-weight: 700; color: #164e89; }
+    .ai-label-minor { font-weight: 600; color: #198664; }
+  </style>
+</head>
+<body>
+  <div class="progress-wizard-container">
+    <div class="progress-wizard">
+      <div class="wizard-step {% if step > 1 %}done{% elif step == 1 %}current{% endif %}">
+        <div class="step-icon">{% if step > 1 %}<span>&#10003;</span>{% else %}1{% endif %}</div>
+        <div class="step-desc">Basic Info<br><small>{% if step > 1 %}Done{% elif step == 1 %}Current{% else %}Upcoming{% endif %}</small></div>
+      </div>
+      <div class="wizard-bar {% if step > 1 %}bar-filled{% endif %}" ></div>
+      <div class="wizard-step {% if step > 2 %}done{% elif step == 2 %}current{% endif %}">
+        <div class="step-icon">{% if step > 2 %}<span>&#10003;</span>{% else %}2{% endif %}</div>
+        <div class="step-desc">Upload Photo<br><small>{% if step > 2 %}Done{% elif step == 2 %}Current{% else %}Upcoming{% endif %}</small></div>
+      </div>
+      <div class="wizard-bar {% if step > 2 %}bar-filled{% endif %}" ></div>
+      <div class="wizard-step {% if step > 3 %}done{% elif step == 3 %}current{% endif %}">
+        <div class="step-icon">{% if step > 3 %}<span>&#10003;</span>{% else %}3{% endif %}</div>
+        <div class="step-desc">Engine Audio<br><small>{% if step > 3 %}Done{% elif step == 3 %}Current{% else %}Upcoming{% endif %}</small></div>
+      </div>
+      <div class="wizard-bar {% if step > 3 %}bar-filled{% endif %}" ></div>
+      <div class="wizard-step {% if step == 4 %}current{% elif step > 4 %}done{% endif %}">
+        <div class="step-icon">{% if step > 4 %}<span>&#10003;</span>{% else %}4{% endif %}</div>
+        <div class="step-desc">Price Breakdown<br><small>{% if step == 4 %}Current{% elif step > 4 %}Done{% else %}Upcoming{% endif %}</small></div>
+      </div>
+    </div>
+    <div class="wizard-progress-label">{{ step }}/4 steps completed</div>
+    <div class="wizard-progress-bar-bg">
+      <div class="wizard-progress-bar-fg" style="width: {{ (step-1)*33 + 1 }}%;"></div>
+    </div>
+  </div>
+
+  <div class="main-flex-wrap">
+    <div class="big-form-card container">
+      <h3>Step 3 of 3: Upload Engine Audio & Analyze</h3>
+      <form method="POST" action="/list-car/audio" enctype="multipart/form-data" id="audioForm" novalidate>
+        <div class="mb-4">
+          <label for="engine_audio" class="form-label">Engine Sound File</label>
+          <input type="file" class="form-control" name="engine_audio" id="engine_audio" accept="audio/*" required />
+        </div>
+
+        <!-- Hidden fields -->
+        <input type="hidden" name="car_name" value="{{ car_name }}">
+        <input type="hidden" name="year" value="{{ year }}">
+        <input type="hidden" name="km_driven" value="{{ km_driven }}">
+        <input type="hidden" name="fuel" value="{{ fuel }}">
+        <input type="hidden" name="seller" value="{{ seller }}">
+        <input type="hidden" name="transmission" value="{{ transmission }}">
+        <input type="hidden" name="registration_state" value="{{ registration_state }}">
+        <input type="hidden" name="photo_filenames" value="{{ photo_filenames }}">
+
+        <div class="mb-4">
+          <button type="submit" class="btn btn-primary w-100" id="predictBtn">Analyze Audio</button>
+        </div>
+
+        {% if cleaned_audio_url %}
+        <div id="audioClips" style="display:block;">
+          <h5>Engine Audio Analysis Result</h5>
+          <p>
+            <span class="ai-label-bold">Predicted Fuel Type:</span>
+            <span class="ai-label-minor">{{ predicted_fuel|default('-') }}</span>
+          </p>
+          <p>
+            <span class="ai-label-bold">Engine Condition:</span>
+            <span class="ai-label-minor">{{ engine_condition|default('-') }}</span>
+          </p>
+          {% if damage_status_list %}
+          <p>
+            <span class="ai-label-bold">Damage Condition(s):</span>
+            <span class="ai-label-minor">
+              {% for ds in damage_status_list %}
+                {{ ds|title }}{% if not loop.last %}, {% endif %}
+              {% endfor %}
+            </span>
+          </p>
+          {% endif %}
+          <audio controls id="engineAudioPlayer">
+            <source src="{{ cleaned_audio_url }}" type="audio/wav">
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+        <a href="/list-car/price-breakdown" class="btn-view-price" id="viewBreakdownBtn" style="display:inline-block;">View Price Breakdown</a>
+        {% else %}
+        <div id="audioClips" style="display:none;">
+          <h5>Engine Audio Analysis Result</h5>
+          <p>
+            <span class="ai-label-bold">Predicted Fuel Type:</span>
+            <span class="ai-label-minor">-</span>
+          </p>
+          <p>
+            <span class="ai-label-bold">Engine Condition:</span>
+            <span id="engineConditionText" class="ai-label-minor">-</span>
+          </p>
+          <p>
+            <span class="ai-label-bold">Damage Condition:</span>
+            <span id="damageConditionText" class="ai-label-minor">-</span>
+          </p>
+          <audio controls id="engineAudioPlayer">
+            <source src="" type="audio/wav">
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+        <a href="/list-car/price-breakdown?car_id={{ car_id }}" class="btn-view-price" id="viewBreakdownBtn" style="display: none;">View Price Breakdown</a>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

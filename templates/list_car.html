@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>List Car - Autovaluator</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='css/list_car.css') }}" rel="stylesheet" />
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/dashboard">Autovaluator</a>
+      <div class="collapse navbar-collapse justify-content-end">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="/marketplace">Marketplace</a></li>
+          <li class="nav-item"><a class="nav-link" href="/cart">My Cart</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about">About Us</a></li>
+          <li class="nav-item"><a class="nav-link text-danger" href="/logout">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- List Car Form -->
+  <div class="container">
+    <div class="form-section">
+      <h3 class="mb-4 text-primary">🚗 List Your Car</h3>
+      <form method="POST" action="/list-car" enctype="multipart/form-data" id="carForm">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Car Name</label>   
+            <input type="text" class="form-control" name="car_name" required />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Year</label>
+            <input type="number" class="form-control" name="year" required />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Kilometers Driven</label>
+            <input type="number" class="form-control" name="km_driven" required />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Owner Type</label>
+            <input type="text" class="form-control" name="owner" required />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Fuel</label>
+            <select class="form-select" name="fuel" required>
+              <option value="Petrol">Petrol</option>
+              <option value="Diesel">Diesel</option>
+              <option value="CNG">CNG</option>
+              <option value="Electric">Electric</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Seller Type</label>
+            <select class="form-select" name="seller" required>
+              <option value="Individual">Individual</option>
+              <option value="Dealer">Dealer</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Transmission</label>
+            <select class="form-select" name="transmission" required>
+              <option value="Manual">Manual</option>
+              <option value="Automatic">Automatic</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Location</label>
+            <input type="text" class="form-control" name="location" required />
+          </div>
+
+          <!-- NEW: Registered State Dropdown -->
+          <div class="col-md-4">
+            <label class="form-label">Registered State</label>
+            <select class="form-select" name="registration_state" required>
+              <option value="">-- Select State --</option>
+              <option value="Andhra Pradesh">Andhra Pradesh</option>
+              <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+              <option value="Assam">Assam</option>
+              <option value="Bihar">Bihar</option>
+              <option value="Chhattisgarh">Chhattisgarh</option>
+              <option value="Goa">Goa</option>
+              <option value="Gujarat">Gujarat</option>
+              <option value="Haryana">Haryana</option>
+              <option value="Himachal Pradesh">Himachal Pradesh</option>
+              <option value="Jharkhand">Jharkhand</option>
+              <option value="Karnataka">Karnataka</option>
+              <option value="Kerala">Kerala</option>
+              <option value="Madhya Pradesh">Madhya Pradesh</option>
+              <option value="Maharashtra">Maharashtra</option>
+              <option value="Manipur">Manipur</option>
+              <option value="Meghalaya">Meghalaya</option>
+              <option value="Mizoram">Mizoram</option>
+              <option value="Nagaland">Nagaland</option>
+              <option value="Odisha">Odisha</option>
+              <option value="Punjab">Punjab</option>
+              <option value="Rajasthan">Rajasthan</option>
+              <option value="Sikkim">Sikkim</option>
+              <option value="Tamil Nadu">Tamil Nadu</option>
+              <option value="Telangana">Telangana</option>
+              <option value="Tripura">Tripura</option>
+              <option value="Uttar Pradesh">Uttar Pradesh</option>
+              <option value="Uttarakhand">Uttarakhand</option>
+              <option value="West Bengal">West Bengal</option>
+              <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+              <option value="Chandigarh">Chandigarh</option>
+              <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+              <option value="Delhi">Delhi</option>
+              <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+              <option value="Ladakh">Ladakh</option>
+              <option value="Lakshadweep">Lakshadweep</option>
+              <option value="Puducherry">Puducherry</option>
+            </select>
+          </div>
+              
+
+          <div class="col-md-4">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" name="email" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Car Photo</label>
+            <input type="file" class="form-control" name="photo" id="photo" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Engine Sound File</label>
+            <input type="file" class="form-control" name="engine_audio" id="engine_audio" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Predicted Price</label>
+            <input type="number" step="any" class="form-control" name="predicted_price" id="predicted_price" readonly />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Your Selling Price</label>
+            <input type="number" step="any" class="form-control" name="seller_price" required />
+          </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-3">
+          <button type="button" class="btn btn-warning text-white" onclick="predict()">⚙ Predict Price</button>
+          <button type="submit" class="btn btn-primary">📤 Submit Listing</button>
+        </div>
+
+        <!-- Audio Preview Section for Predict button -->
+        <div id="audio-preview-results" class="mt-4"></div>
+      </form>
+      <div class="alert alert-info mt-4 alert-box" id="ai-alert"></div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/list_car.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

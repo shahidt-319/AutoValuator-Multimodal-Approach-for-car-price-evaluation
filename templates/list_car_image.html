@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Upload Car Photo - Detect Damage</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='css/list_car_image.css') }}" rel="stylesheet" />
+  <style>
+    .card-img-top {
+      object-fit: cover;
+      aspect-ratio: 4/3;
+      background: #f9fafc;
+      border-radius: 10px 10px 0 0;
+      border-bottom: 1px solid #e0e5ee;
+      width: 100%;
+    }
+    .badge-damage {
+      font-size: 1.11rem;
+      font-weight: 700;
+      border-radius: 7px;
+      box-shadow: 0 1px 4px #e0e0e0;
+      padding: 0.54em 1.15em;
+      margin-bottom: 10px;
+      margin-top: 6px;
+      letter-spacing: 0.045em;
+      text-align: center;
+      display: block;
+      min-width: 120px;
+    }
+    .damage-label-danger { background: #ff3f37; color: #fff; }
+    .damage-label-warning { background: #ffd933; color: #654800; }
+    .damage-label-success { background: #1ddb83; color: #114e36; }
+    .damage-label-secondary { background: #e0e0e0; color: #455263; }
+    .image-card-container {
+      min-width: 180px;
+      max-width: 240px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-wizard-container">
+  <div class="progress-wizard">
+    <div class="wizard-step {% if step > 1 %}done{% elif step == 1 %}current{% endif %}">
+      <div class="step-icon">{% if step > 1 %}<span>&#10003;</span>{% else %}1{% endif %}</div>
+      <div class="step-desc">Basic Info<br><small>{% if step > 1 %}Done{% elif step == 1 %}Current{% else %}Upcoming{% endif %}</small></div>
+    </div>
+    <div class="wizard-bar {% if step > 1 %}bar-filled{% endif %}" ></div>
+    <div class="wizard-step {% if step > 2 %}done{% elif step == 2 %}current{% endif %}">
+      <div class="step-icon">{% if step > 2 %}<span>&#10003;</span>{% else %}2{% endif %}</div>
+      <div class="step-desc">Upload Photo<br><small>{% if step > 2 %}Done{% elif step == 2 %}Current{% else %}Upcoming{% endif %}</small></div>
+    </div>
+    <div class="wizard-bar {% if step > 2 %}bar-filled{% endif %}" ></div>
+    <div class="wizard-step {% if step > 3 %}done{% elif step == 3 %}current{% endif %}">
+      <div class="step-icon">{% if step > 3 %}<span>&#10003;</span>{% else %}3{% endif %}</div>
+      <div class="step-desc">Engine Audio<br><small>{% if step > 3 %}Done{% elif step == 3 %}Current{% else %}Upcoming{% endif %}</small></div>
+    </div>
+    <div class="wizard-bar {% if step > 3 %}bar-filled{% endif %}" ></div>
+    <div class="wizard-step {% if step == 4 %}current{% elif step > 4 %}done{% endif %}">
+      <div class="step-icon">{% if step > 4 %}<span>&#10003;</span>{% else %}4{% endif %}</div>
+      <div class="step-desc">Price Breakdown<br><small>{% if step == 4 %}Current{% elif step > 4 %}Done{% else %}Upcoming{% endif %}</small></div>
+    </div>
+  </div>
+  <div class="wizard-progress-label">{{ step }}/4 steps completed</div>
+  <div class="wizard-progress-bar-bg">
+    <div class="wizard-progress-bar-fg" style="width: {{ (step-1)*33 + 1 }}%;"></div>
+  </div>
+</div>
+
+  <div class="container-fluid px-lg-5 px-2 mt-5">
+    <h3 class="text-center mt-2 mb-4">Upload Car Photos & Detect Damage</h3>
+    <form id="imageForm" enctype="multipart/form-data" method="POST" action="/list-car/image">
+      <div class="mb-3">
+        <label for="photoInput" class="form-label">Select Car Photos</label>
+        <input type="file" class="form-control" id="photoInput" name="photos" accept="image/*" multiple required />
+      </div>
+      <!-- Hidden car detail inputs -->
+      <input type="hidden" name="car_name" value="{{ session['car_basic']['car_name'] }}" />
+      <input type="hidden" name="year" value="{{ session['car_basic']['year'] }}" />
+      <input type="hidden" name="km_driven" value="{{ session['car_basic']['km_driven'] }}" />
+      <input type="hidden" name="owner" value="{{ session['car_basic']['owner'] }}" />
+      <input type="hidden" name="fuel" value="{{ session['car_basic']['fuel'] }}" />
+      <input type="hidden" name="seller" value="{{ session['car_basic']['seller'] }}" />
+      <input type="hidden" name="transmission" value="{{ session['car_basic']['transmission'] }}" />
+      <input type="hidden" name="location" value="{{ session['car_basic']['location'] }}" />
+      <input type="hidden" name="registration_state" value="{{ session['car_basic']['registration_state'] }}" />
+      <input type="hidden" name="email" value="{{ session['car_basic']['email'] }}" />
+
+      <button type="button" class="btn btn-warning w-100 my-3" id="detectDamageBtn">Detect Damage</button>
+      <!-- Wide grid, nice spacing, up to 5 per row XL screen --> 
+      <div class="container-fluid px-0 mb-4">
+        <div id="imagePreviewGrid" class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4 justify-content-center mt-2"></div>
+      </div>
+      <button type="submit" name="submit" class="btn btn-primary w-100" style="display:none;" id="uploadPhotoBtn">Upload Photo & Proceed to Audio</button>
+    </form>
+  </div>
+
+<script>
+const photoInput = document.getElementById('photoInput');
+const imagePreviewGrid = document.getElementById('imagePreviewGrid');
+const detectBtn = document.getElementById('detectDamageBtn');
+const uploadPhotoBtn = document.getElementById('uploadPhotoBtn');
+
+// When user selects images: preview them as thumbnails in spaced out cards
+photoInput.addEventListener('change', () => {
+  imagePreviewGrid.innerHTML = '';
+  uploadPhotoBtn.style.display = 'none';
+  for (let i = 0; i < photoInput.files.length; i++) {
+    const file = photoInput.files[i];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const thumbHtml = `
+        <div class="col d-flex justify-content-center">
+          <div class="card shadow-sm border-0 image-card-container d-flex flex-column align-items-center mb-3">
+            <img src="${e.target.result}" class="card-img-top mt-2" alt="Car image" />
+            <div class="card-body d-flex flex-column align-items-center p-2">
+              <div id="damageLabel${i}" class="badge-damage damage-label-secondary">Not checked</div>
+            </div>
+          </div>
+        </div>`;
+      imagePreviewGrid.insertAdjacentHTML('beforeend', thumbHtml);
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// AJAX: Run detection, update damage label for each card
+detectBtn.addEventListener('click', async () => {
+  if (!photoInput.files.length) {
+    alert('Please select at least one image!');
+    return;
+  }
+  const formData = new FormData();
+  for (let i = 0; i < photoInput.files.length; i++) {
+    formData.append('photos[]', photoInput.files[i]);
+  }
+  formData.append('detect_damage', '1');
+  for (let i = 0; i < photoInput.files.length; i++) {
+    const labelDiv = document.getElementById('damageLabel' + i);
+    if (labelDiv) {
+      labelDiv.textContent = "Checking...";
+      labelDiv.className = "badge-damage damage-label-secondary";
+    }
+  }
+  uploadPhotoBtn.style.display = 'none';
+  try {
+    const response = await fetch('/list-car/image', {
+      method: 'POST',
+      body: formData
+    });
+    if (!response.ok) throw new Error(`Server error: ${response.status}`);
+    const data = await response.json();
+    if (data.results) {
+      data.results.forEach((result, idx) => {
+        const labelDiv = document.getElementById('damageLabel' + idx);
+        if (labelDiv) {
+          let dmg = result.damage_status ? result.damage_status.toLowerCase() : "unknown";
+          let txt = "Damage: " + (dmg.charAt(0).toUpperCase() + dmg.slice(1));
+          let cls =
+            dmg === 'severe'   ? 'badge-damage damage-label-danger'    :
+            dmg === 'moderate' ? 'badge-damage damage-label-warning'   :
+            dmg === 'minor'    ? 'badge-damage damage-label-success'   :
+                                 'badge-damage damage-label-secondary';
+          labelDiv.textContent = txt;
+          labelDiv.className = cls;
+        }
+      });
+    }
+    uploadPhotoBtn.style.display = 'block';
+  } catch (err) {
+    for (let i = 0; i < photoInput.files.length; i++) {
+      const labelDiv = document.getElementById('damageLabel' + i);
+      if (labelDiv) {
+        labelDiv.textContent = `Error: ${err.message}`;
+        labelDiv.className = 'badge-damage damage-label-danger';
+      }
+    }
+    uploadPhotoBtn.style.display = 'none';
+  }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

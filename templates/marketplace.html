@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Marketplace - Autovaluator</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='css/marketplace.css') }}" rel="stylesheet" />
+  <style>
+    body {
+      background: #e6f0ff;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .navbar {
+      background-color: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.09);
+      margin-bottom: 18px;
+    }
+    .navbar-brand {
+      color: #007bff;
+      font-weight: bold;
+      font-size: 1.3rem;
+      letter-spacing: 0.08em;
+    }
+    .filter-box { background: #f7fbff; border-radius: 15px; margin-bottom: 32px; box-shadow: 0 2px 10px #ddd3;}
+    .market-cards-row { display: flex; flex-wrap: wrap; gap: 36px 22px; justify-content: center; padding-bottom: 40px; }
+    .marketplace-card {
+      width: 315px; min-height: 420px;
+      display: flex; flex-direction: column;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px #5f72bd15;
+      background: #fff;
+      transition: box-shadow .17s, transform .17s;
+      border: 2.5px solid #ddeaff;
+      margin-bottom: 18px;
+      align-items: stretch;
+    }
+    .marketplace-card:hover {
+      transform: translateY(-6px) scale(1.025);
+      box-shadow: 0 12px 41px #008cff30;
+    }
+    .market-img-large {
+      width: 100%;
+      max-width: 225px;
+      height: 165px;
+      object-fit: cover;
+      border-radius: 14px 14px 8px 8px;
+      box-shadow: 0 2px 16px #9bdbea33, 0 1px 4px #ddd;
+      margin: 18px auto 12px auto; 
+      background: #f6fafe;
+      display: block;
+    }
+    .car-title { font-weight: bold; color: #0056b3; font-size: 1.22rem; margin-bottom: 1px;}
+    .car-meta { color: #666; font-weight: 500; font-size: 1rem; margin-bottom: 8px; }
+    .car-price-label { font-size: 1.01rem; color: #888;}
+    .car-seller {font-size: 1.22rem;font-weight:700;color:#17a34a;}
+    .car-predict {font-size:1.18rem;color: #4286f4;font-weight:800;}
+    .marketplace-card .card-body { padding: 18px 18px 12px 18px; }
+    .market-btn { background-color: #007bff; color: #fff; font-weight: 700; border-radius: 24px; border: none; padding: 12px 0; font-size: 1.12rem; margin-top:10px; width: 88%; margin-left:auto; margin-right:auto; display:block;}
+    .market-btn:hover { background-color: #0056b3;}
+    @media (max-width:1100px) {.marketplace-card{width:95vw;min-height:unset;}}
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/dashboard">Autovaluator</a>
+      <div class="collapse navbar-collapse justify-content-end">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about">About Us</a></li>
+          <li class="nav-item"><a class="nav-link text-danger" href="/logout">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <div class="filter-box p-3 mb-4">
+      <form method="GET" action="/marketplace" class="row market-filters gx-2 gy-3 align-items-end mb-2">
+        <div class="col-md-2">
+          <label for="model" class="form-label">Model</label>
+          <select class="form-select" name="model" id="model">
+            <option value="">All</option>
+            {% for m in all_models %}
+              <option value="{{ m }}" {% if selected_model==m %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label for="fuel" class="form-label">Fuel</label>
+          <select class="form-select" name="fuel" id="fuel">
+            <option value="">All</option>
+            {% for f in all_fuels %}
+              <option value="{{ f }}" {% if selected_fuel==f %}selected{% endif %}>{{ f.title() }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label for="transmission" class="form-label">Transmission</label>
+          <select class="form-select" name="transmission" id="transmission">
+            <option value="">All</option>
+            {% for t in all_transmissions %}
+              <option value="{{ t }}" {% if selected_transmission==t %}selected{% endif %}>{{ t.title() }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label for="registration_state" class="form-label">State</label>
+          <select class="form-select" name="registration_state" id="registration_state">
+            <option value="">All</option>
+            {% for s in all_states %}
+              <option value="{{ s }}" {% if selected_state==s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label for="price" class="form-label">Max Price</label>
+          <input type="number" class="form-control" name="price" id="price" value="{{ selected_price or '' }}" placeholder="₹">
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-success w-100">Filter</button>
+        </div>
+      </form>
+    </div>
+    <div class="market-cards-row">
+      {% if cars %}
+        {% for car in cars %}
+        <div class="marketplace-card shadow-sm">
+          <a href="/car/{{ car['id'] }}" style="text-decoration: none; color: inherit;">
+            {% if car.worst_image %}
+              <img src="{{ url_for('static', filename='uploads/' ~ car.worst_image['photo']) }}"
+                   class="market-img-large"
+                   alt="Car Image">
+            {% else %}
+              <img src="{{ url_for('static', filename='uploads/default.jpg') }}" class="market-img-large" alt="No image">
+            {% endif %}
+            <div class="card-body">
+              <div class="car-title mb-1">{{ car['car_name'] or 'Unknown Model' }} <span style="font-size:.96em;color:#196fa7;">({{ car['year'] or 'N/A' }})</span></div>
+              <div class="car-meta mb-2">{{ car['fuel'] or 'N/A' }} <span class="mx-1">|</span> {{ car['transmission'] or 'N/A' }} <span class="mx-1">|</span> {{ car['registration_state'] or 'N/A' }}</div>
+              <div><span class="car-predict">Predicted:</span> ₹{{ car['predicted_price'] or 'N/A' }}</div>
+              <div class="mb-2"><span class="car-price-label">Seller Price:</span> <span class="car-seller">₹{{ car['seller_price'] or 'N/A' }}</span></div>
+              {% if car['cleaned_audio'] %}
+                <audio controls class="audio-player mt-2" style="width:95%;">
+                  <source src="{{ url_for('static', filename='uploads/' ~ car['cleaned_audio']) }}" type="audio/wav" />
+                  Your browser does not support the audio element.
+                </audio>
+              {% endif %}
+              <a href="/car/{{ car['id'] }}" class="market-btn">View Details</a>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="col-12 text-center">
+          <p class="no-results">🔍 No cars found for the selected filters.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  <footer>© 2025 Autovaluator — Multimodal Approach for Car Price Evaluation.</footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

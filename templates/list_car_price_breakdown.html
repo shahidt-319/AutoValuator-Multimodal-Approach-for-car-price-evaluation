@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Car Price Breakdown & Listing</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+  <style>
+    body { background: linear-gradient(115deg, #b2ebf2 0%, #e6eeff 100%); min-height: 100vh; font-family: "Inter", Arial, sans-serif;}
+    .container-hero { max-width: 1250px; margin: 32px auto 0 auto; display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.95); border-radius: 22px; box-shadow: 0 16px 48px rgba(23,54,88,0.13), 0 2px 8px rgba(23,54,88,0.08); padding: 0 0 28px 0;}
+    .price-tube-wrap { background: linear-gradient(90deg,#e3f3ff 0%,#e4ffd5 100%); border-radius: 17px; padding: 38px 36px 30px 36px; margin-top: -30px; display: flex; flex-direction: row; align-items: stretch; justify-content: space-between; width: 100%; min-height: 320px; box-shadow: 0 8px 32px rgba(13,136,164,0.09);}
+    .tube-side { flex: 1; margin: 0 32px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 13px; background: rgba(14,84,146,0.08); box-shadow: 0 4px 18px rgba(80,150,180,0.08); padding: 24px 18px;}
+    .tube-label { font-size: 1.25rem; font-weight: 700; color: #1346b5; margin-bottom: 12px;}
+    .tube-price { font-size: 2.9rem; font-weight: 700; color: #19c37d; letter-spacing: 2px; text-shadow: 0 2px 0 #e3ffea; margin-bottom: 6px;}
+    .tube-year { font-size: 1.12rem; font-weight: 500; color: #2c3e50; background: #e4effc; padding: 6px 26px; border-radius: 8px; margin-bottom: 6px; margin-top: 6px; box-shadow: 0 1px 3px #e3eafc;}
+    .vs-divider { display: flex; align-items: center; justify-content: center; flex-direction: column; margin: 0 20px;}
+    .vs-circle { background: linear-gradient(135deg,#13bfcf 0%,#48e07c 100%); font-size: 2rem; color: #fff; font-weight: bold; width: 70px; aspect-ratio: 1; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px #82ffe04d; margin-bottom: 10px; margin-top: 10px;}
+    .breakdown-card { background: rgba(244,252,255,0.88); border-radius: 10px; box-shadow: 0 1px 6px rgba(13,136,164,0.11); padding: 16px 22px; margin: 28px auto 10px auto; max-width: 700px;}
+    .form-section { background: rgba(14,144,85,0.06); border-radius: 10px; padding: 24px 28px; margin-top: 32px; box-shadow: 0 2px 12px #defffa47; max-width: 600px; margin-left: auto; margin-right: auto;}
+    .form-label { font-weight: 700;}
+    .btn-gradient-main { background: linear-gradient(90deg,#434cff 0%,#51efa7 100%); color: #fff!important; font-weight: 700; padding: 12px 38px; font-size: 1.2rem; border-radius: 10px; box-shadow: 0 4px 12px #e3ebeccd; margin-left: 8px; margin-right: 8px;}
+    .btn-gradient-main:hover { background: linear-gradient(90deg,#51efa7 0%, #434cff 100%);}
+    .deduct-amount { color: #d10000; font-weight: bold;}
+    .info-bold { font-weight: 600; color: #177f68;}
+    .progress-wizard-container {
+  width:100%;padding-top:20px;padding-bottom:34px;
+  text-align:center;background:none;position:relative;z-index:2;
+}
+.progress-wizard {
+  display:flex;align-items:center;justify-content:center;gap:0;width:90vw;max-width:720px;margin:0 auto 18px auto;
+}
+.wizard-step {
+  display:flex;flex-direction:column;align-items:center;flex:1;
+  min-width:90px;position:relative;
+}
+.step-icon {
+  width:40px;height:40px;border-radius:50%;background:linear-gradient(90deg,#ecf2ff,#ffe6b0 130%);
+  color:#5a7beb;font-weight:900;display:flex;align-items:center;justify-content:center;
+  font-size:1.45em;border:3px solid #c3d6ff;box-shadow:0 4px 20px #f8d9a233;transition:.21s;
+  margin-bottom:2px;
+}
+.wizard-step.done .step-icon {
+  background:linear-gradient(90deg,#33ddba 65%,#36c1e0 120%);
+  color:#fff;border-color:#33ddba;
+  animation:pulse 0.4s;
+}
+.wizard-step.current .step-icon {
+  background:linear-gradient(90deg,#4f8bff 65%,#ffd025 120%);
+  color:#fff;border-color:#ffd025;
+  box-shadow:0 4px 17px #86b3f866;
+  font-size:1.55em;
+}
+@keyframes pulse {
+  0% {transform:scale(1);}
+  60% {transform:scale(1.18);}
+  100% {transform:scale(1);}
+}
+.step-desc {
+  font-size:1em;font-weight:600;color:#0e395c;text-align:center;line-height:1.18;
+}
+.wizard-step.done .step-desc {color: #24bd98;font-weight:700;}
+.wizard-step.current .step-desc {color:#1e81d6;font-weight:700;}
+.wizard-bar {
+  width:48px;height:5px;
+  background:linear-gradient(90deg,#e5eafc 70%,#ffe6b0 120%);
+  border-radius:2.5px;margin:0 2px;transition:.26s;
+}
+.bar-filled {background:linear-gradient(90deg,#18dcb0 85%,#33b0fc 140%);}
+.wizard-progress-label {
+  margin:7px auto 5px;font-size:1.08em;font-weight:700;color:#468fff;letter-spacing:.04em;
+}
+.wizard-progress-bar-bg{
+  height:7px;
+  background:linear-gradient(90deg,#dfedfa 60%,#ffe6b0 130%);
+  border-radius:5px;width:85vw;max-width:540px;margin:0 auto;
+  overflow:hidden;position:relative;}
+.wizard-progress-bar-fg{
+  height:7px;background:linear-gradient(90deg,#33beb8 40%,#236afd 100%);
+  border-radius:5px;width:10%;transition:width .3s;}
+
+  </style>
+</head>
+<body>
+  <div class="progress-wizard-container">
+  <div class="progress-wizard">
+    <div class="wizard-step {% if step > 1 %}done{% elif step == 1 %}current{% endif %}">
+      <div class="step-icon">{% if step > 1 %}<span>&#10003;</span>{% else %}1{% endif %}</div>
+      <div class="step-desc">Basic Info<br><small>{% if step > 1 %}Done{% elif step == 1 %}Current{% else %}Upcoming{% endif %}</small></div>
+    </div>
+    <div class="wizard-bar {% if step > 1 %}bar-filled{% endif %}" ></div>
+    <div class="wizard-step {% if step > 2 %}done{% elif step == 2 %}current{% endif %}">
+      <div class="step-icon">{% if step > 2 %}<span>&#10003;</span>{% else %}2{% endif %}</div>
+      <div class="step-desc">Upload Photo<br><small>{% if step > 2 %}Done{% elif step == 2 %}Current{% else %}Upcoming{% endif %}</small></div>
+    </div>
+    <div class="wizard-bar {% if step > 2 %}bar-filled{% endif %}" ></div>
+    <div class="wizard-step {% if step > 3 %}done{% elif step == 3 %}current{% endif %}">
+      <div class="step-icon">{% if step > 3 %}<span>&#10003;</span>{% else %}3{% endif %}</div>
+      <div class="step-desc">Engine Audio<br><small>{% if step > 3 %}Done{% elif step == 3 %}Current{% else %}Upcoming{% endif %}</small></div>
+    </div>
+    <div class="wizard-bar {% if step > 3 %}bar-filled{% endif %}" ></div>
+    <div class="wizard-step {% if step == 4 %}current{% elif step > 4 %}done{% endif %}">
+      <div class="step-icon">{% if step > 4 %}<span>&#10003;</span>{% else %}4{% endif %}</div>
+      <div class="step-desc">Price Breakdown<br><small>{% if step == 4 %}Current{% elif step > 4 %}Done{% else %}Upcoming{% endif %}</small></div>
+    </div>
+  </div>
+    <div class="wizard-progress-label">{{ step }}/4 steps completed</div>
+    <div class="wizard-progress-bar-bg">
+      <div class="wizard-progress-bar-fg" style="width: {{ (step-1)*33 + 1 }}%;"></div>
+    </div>
+  </div>
+  <div class="container-hero">
+    <h2 class="text-center mt-4 mb-1 display-5" style="color:#2b447a;font-weight:700;">
+      🚗 Car Price Comparison & Listing – {{ car_model_name }} ({{ model_year }})
+    </h2>
+    <p class="fs-5 text-center" style="color:#148b60;">
+      See how your predicted value compares to the <b>current price in 2025</b>.
+    </p>
+    <div class="price-tube-wrap mt-4">
+      <div class="tube-side">
+        <span class="tube-label">Predicted Value</span>
+        <span class="tube-year">Year: {{ model_year }}</span>
+        <span class="tube-price">₹{{ final_price }}</span>
+        <span class="small text-secondary">ML Prediction (your car's condition)</span>
+      </div>
+      <div class="vs-divider">
+        <div class="vs-circle">VS</div>
+      </div>
+      <div class="tube-side">
+        <span class="tube-label">Current New Price</span>
+        <span class="tube-year">2025 Reference</span>
+        <span class="tube-price">₹{{ current_price if current_price else 'Not Available' }}</span>
+        <span class="small text-secondary">Market price for this model</span>
+      </div>
+    </div>
+    <div class="breakdown-card mt-4">
+      <h4 class="mb-2" style="color:#23a6f1;">Detailed Price Breakdown</h4>
+      <table class="table border rounded mt-3">
+        <thead class="table-light">
+          <tr>
+            <th>Description</th>
+            <th>Effect & Factors</th>
+            <th>Price (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for desc, effect, price in price_factors %}
+          <tr{% if loop.last %} style="background:#e1ffe7;font-weight:700;"{% endif %}>
+            <td>{{ desc }}</td>
+            <td>{{ effect|safe }}</td>
+            <td>₹{{ price }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div id="engineInfo" class="mt-3 text-center">
+        {% if engine_condition and engine_condition|lower != 'unknown' %}
+          <h5>🔧 Engine Condition: <span class="info-bold">{{ engine_condition|capitalize }}</span></h5>
+        {% endif %}
+        {% if damage_status and damage_status|lower != 'unknown' %}
+          <h6>🧰 Damage Detected: <span class="info-bold">{{ damage_status|capitalize }}</span></h6>
+        {% endif %}
+      </div>
+    </div>
+    <div class="form-section mt-2">
+      <form method="POST" action="{{ url_for('price_breakdown') }}">
+        <!-- Make sure car_id is always available on POST! -->
+        <input type="hidden" name="car_id" value="{{ request.args.get('car_id') or car_id }}">
+        <label for="seller_price" class="form-label">Set Your Selling Price (₹)</label>
+        <input type="number" step="any" class="form-control form-control-lg mb-2"
+               id="seller_price" name="seller_price" required
+               value="{{ seller_price }}"/>
+        <div class="d-flex mt-3 justify-content-center">
+          <button type="submit" class="btn btn-gradient-main">Submit Listing</button>
+          <a href="{{ url_for('list_car_audio') }}" class="btn btn-gradient-main">Back to Audio Step</a>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

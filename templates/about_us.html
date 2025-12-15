@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>About Us - Autovaluator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/dashboard">Autovaluator</a>
+            <div class="navbar-links">
+                <a href="/marketplace">Marketplace</a>
+                <a href="/about">About Us</a>
+                <a href="/logout" class="logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="about-main">
+        <div class="about-header">
+            <h1>About Autovaluator</h1>
+            <p>Your smart platform for reliable car price evaluation, powered by AI.</p>
+        </div>
+        <section class="about-features">
+            <h2>Our Features</h2>
+            <ul class="features-list">
+                <li><span class="feat-icon">🔑</span> <strong>User Registration:</strong> Secure OTP-based signup and role management.</li>
+                <li><span class="feat-icon">📤</span> <strong>Car Listing:</strong> Easily list cars with details, images, and engine sound uploads.</li>
+                <li><span class="feat-icon">🖼️</span> <strong>Image Analysis:</strong> AI classifies and detects damage severity from car photos.</li>
+                <li><span class="feat-icon">🔊</span> <strong>Audio Analysis:</strong> Engine health checked using advanced sound AI models.</li>
+                <li><span class="feat-icon">💸</span> <strong>Price Prediction:</strong> Multi-modal AI combines all car details for fair pricing.</li>
+                <li><span class="feat-icon">🚗</span> <strong>Marketplace:</strong> Browse, filter, and compare cars with real-time price insights.</li>
+                <li><span class="feat-icon">📍</span> <strong>State-Based Validity:</strong> Dynamic adjustment of price using location-specific vehicle validity periods.</li>
+                <li><span class="feat-icon">🛒</span> <strong>Cart System:</strong> Add cars to your cart for easier comparison and tracking.</li>
+                <li><span class="feat-icon">📧</span> <strong>Contact Seller:</strong> Built-in email contact for seamless buyer-seller interaction.</li>
+                <li><span class="feat-icon">🎵</span> <strong>Audio Playback:</strong> Listen to preprocessed engine sounds for transparent evaluation.</li>
+            </ul>
+        </section>
+        <section class="about-footer">
+            <p>Our goal is to bring objectivity, transparency, and trust to the used car market using cutting-edge artificial intelligence.</p>
+            <p>© 2025 Autovaluator Team</p>
+        </section>
+    </main>
+</body>
+</html>

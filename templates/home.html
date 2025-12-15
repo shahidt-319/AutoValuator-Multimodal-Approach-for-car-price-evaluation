@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>AutoValuator | AI Car Marketplace</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) fixed;
+      min-height: 100vh;
+      font-family: 'Poppins', Arial, sans-serif;
+      overflow-x: hidden;
+    }
+    nav.navbar {
+      padding:18px 48px;
+      background:linear-gradient(90deg,#373b44,#4286f4 90%);
+      box-shadow: 0 6px 28px #4286f466;
+      border-bottom: 1px solid #fdc1d3;
+    }
+    .navbar-brand {
+      color:#fff;font-size:2.1rem;font-weight:900;
+      letter-spacing:1px;text-shadow:2px 3px 16px #4568dc66;
+    }
+    .nav-btns {
+      float:right;display:flex;gap:24px;margin-top:7px;
+    }
+    .nav-btn {
+      background:linear-gradient(120deg,#fed6e3 0,#5f72bd 80%);
+      color:#fff; font-weight:800;font-size:1.1rem;
+      border:none;border-radius:50px;padding:11px 36px;
+      box-shadow:0 10px 35px #fed6e366, 0 3px 10px #4568dccc;
+      transition:.17s; outline:none;text-shadow:1px 1px 5px #4286f466;
+    }
+    .nav-btn:hover {background:linear-gradient(120deg,#5f72bd 0,#fed6e3 80%);}
+    .banner {
+      text-align:center; margin-bottom:24px; padding:66px 0 6px;
+      background:linear-gradient(134deg, #b6eaff 60%, #cbbefd 100%);
+      box-shadow:0 3px 32px #4286f433;
+      border-radius:0 0 52px 52px / 0 0 16px 16px;
+    }
+    .banner h1 {
+      font-size:3.2rem; font-weight:900; letter-spacing:2px;
+      color:#373b44;
+      text-shadow:0 10px 44px #fffafc, 0 3px 6px #373b4440;
+      margin-bottom:0;
+    }
+    .banner p { font-size:1.3rem;font-weight:500; margin-bottom:26px;}
+    .features-list {display:grid;grid-template-columns:repeat(2,1fr);gap:9px 18px;max-width:1100px;margin:30px auto 0;}
+    .features-list li {
+      background:#fff;color:#373b44;
+      font-tier:700;font-size:1.08rem;box-shadow:0 2px 12px #5f72bd19;
+      border-left:9px solid #56ccf2;padding:13px 25px 12px 28px;
+      border-radius:18px 6px 16px 10px;
+      transition:.2s;position:relative;
+    }
+    .features-list li:before {
+      content:"★";
+      color:#ffc371;
+      position:absolute;left:7px;top:50%;transform:translateY(-50%);
+      font-size:1.23em;
+    }
+
+    .models-row {display:flex;gap:48px;flex-wrap:wrap;justify-content:center;margin:62px 0;}
+    .model-card {
+      background:rgba(255,255,255,0.93);
+      border-radius:30px;
+      box-shadow:
+        0 15px 40px #b6eaff99, 
+        0 1.5px 6px #fed6e399,
+        0 2px 20px #fed6e388;
+      min-width:260px;max-width:316px;flex:1 1 290px;
+      padding:36px 22px 27px 22px;text-align:center;transition:.18s;
+      border:2.5px solid #ffdde1;
+      position:relative;
+      perspective:800px;
+    }
+    .model-card:hover {
+      transform:scale(1.09) rotateY(3deg) translateY(-6px);
+      box-shadow:0 32px 80px #b6eaff77;
+      border-color: #fffbe8;
+      z-index:1;
+    }
+    .model-card h4 { margin-bottom:10px;font-weight:900;color:#4286f4;font-size:1.24em;}
+    .model-card p { font-size:1.04rem; color:#222;margin-bottom:8px;}
+    .model-info-btn {
+      margin-top:20px;background:linear-gradient(120deg, #4286f4 0%, #fed6e3 100%);
+      color:#fff;font-weight:800;border:none;border-radius:50px;padding:10px 26px;font-size:1.06rem;cursor:pointer;
+      box-shadow:0 3px 19px #56ccf258;
+      transition:.18s;
+    }
+    .model-info-btn:hover {background:linear-gradient(120deg,#fed6e3 0,#4286f4 100%);}
+    .modal-backdrop {position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0008;z-index:2100;}
+    .modal-dialog-custom {position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      background:#fff;padding:33px 32px 27px 32px;border-radius:22px;box-shadow:0 10px 80px #b6eaffbb;z-index:2200;width:370px;}
+    .modal-title {font-weight:900;font-size:1.3rem;color:#4568dc;margin-bottom:16px;}
+    .modal-close {position:absolute;top:16px;right:17px;cursor:pointer;font-size:1.25rem;color:#b721ff;}
+    .market-section {background:rgba(182,234,255,0.27);padding:72px 0 60px;}
+    .filter-bar {background:#fff;box-shadow:0 5px 25px #faaca866;
+      border-radius:16px;padding:28px 37px;margin-bottom:38px;display:flex;gap:22px;align-items:center;justify-content:center;}
+    .filter-bar select, .filter-bar input[type=text], .filter-bar input[type=number] {
+      padding:9px 20px;border-radius:13px;border:2px solid #ffdde1;font-size:1.09rem;box-shadow:0 2px 8px #b6eaff13;}
+    .market-cars-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:30px;justify-items:center;}
+    .car-card {
+      background:linear-gradient(135deg,#fffbe8 70%,#e0eaff 100%);
+      border-radius:28px;
+      box-shadow:0 10px 44px #fffde466,0 1.5px 2px #fed6e388;
+      padding:15px 14px 9px 14px;text-align:left;transition:box-shadow .14s,min-width .20s;
+      min-width:242px; max-width:370px; position:relative;
+      border:2.5px solid #b721ff13;
+      perspective:600px;
+      overflow:hidden;
+    }
+    .car-card:hover {box-shadow:0 28px 66px #fed6e377, 0 3px 18px #4286f411; transform:translateY(-5px) scale(1.04);}
+    .car-photo {width:100%;height:178px;object-fit:cover;border-radius:15px 15px 8px 8px;box-shadow:0 2px 20px #4286f412;}
+    .car-name {font-weight:900;font-size:1.4rem;margin:10px 0 0 0;letter-spacing:.6px;}
+    .car-year {color:#4286f4;font-weight:800;}
+    .car-price-row {margin:13px 0 2px 0;display:flex;gap:13px;}
+    .car-pred, .car-act {font-size:1.1rem;padding:8px 15px;border-radius:13px; box-shadow:0 1.5px 8px #fed6e333;}
+    .car-pred {background:#e6f6fd;color:#4286f4;}
+    .car-act {background:#eef9ee;color:#65c16f;}
+    .car-btn-row {margin-top:15px;}
+    .car-btn {
+      background:linear-gradient(90deg,#4286f4,#fed6e3 130%);
+      color:#fff;border:none;border-radius:50px;padding:8px 22px;font-size:1.07rem;margin-right:8px;font-weight:800;cursor:pointer;box-shadow:0 2px 16px #4286f466;}
+    .car-btn.details {background:linear-gradient(90deg,#fed6e3,#4286f4 130%);}
+    .about-box {background:linear-gradient(135deg,#fff,#f0f3fa 90%);box-shadow:0 6px 32px #fed6e322;
+      padding:40px 36px 26px 36px;border-radius:22px;max-width:670px;margin:62px auto 22px; text-align:center;}
+    .about-box h2 {font-weight:900;color:#4286f4;margin-bottom:20px;font-size:2em;}
+    .about-box p {color:#373b44;font-size:1.15rem;}
+    @media (max-width:1200px) {.features-list{grid-template-columns:1fr;}}
+    @media (max-width:900px) { .models-row {flex-direction:column;align-items:center;} .car-photo{height:130px;} }
+    @media (max-width:760px) { .nav-btns{position:static;flex-direction:column;align-items:center;} .banner h1{font-size:2.1rem;} }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a class="navbar-brand" href="/">AutoValuator</a>
+    <div class="nav-btns">
+      <button class="nav-btn" onclick="window.location.href='/login'">Login</button>
+      <button class="nav-btn" onclick="window.location.href='/register'">Register</button>
+    </div>
+  </nav>
+  <div class="banner">
+    <h1>AutoValuator</h1>
+    <p>AI-powered car marketplace and predictive analytics platform</p>
+    <ul class="features-list">
+     {% for feat in project_features_left %}
+      <li>{{ feat }}</li>
+     {% endfor %}
+   {% for feat in project_features_right %}
+    <li>{{ feat }}</li>
+   {% endfor %}
+    </ul>
+
+    </ul>
+  </div>
+
+  <div class="about-box">
+    <h2>About The Project</h2>
+    <p>
+      AutoValuator combines deep learning (image/audio), VIN decoding, and traditional ML to deliver automatic pricing, fault/damage detection, and easy car listing for everyone.
+      Sellers and buyers connect through a secure, AI-enhanced marketplace, with confidence in every transaction. Register now for access to the marketplace and unlock full car and model details!
+    </p>
+  </div>
+
+  <div class="container">
+    <h2 style="font-weight:900;color:#4286f4;text-align:center;margin-top:64px;">AI Models Used</h2>
+    <div class="models-row">
+      {% for mdl in ai_models %}
+      <div class="model-card">
+        <h4>{{ mdl.name }}</h4>
+        <p>{{ mdl.desc }}</p>
+        <button class="model-info-btn" onclick="showInfo({{ loop.index0 }})">View Model Info</button>
+      </div>
+      {% endfor %}
+    </div>
+    <div id="modelModal" style="display:none;">
+      <div class="modal-backdrop" onclick="hideInfo()"></div>
+      <div class="modal-dialog-custom">
+        <span class="modal-close" onclick="hideInfo()">&#10005;</span>
+        <div class="modal-title" id="modelModalTitle"></div>
+        <div id="modelModalText" style="margin-bottom:12px;"></div>
+      </div>
+    </div>
+    <h2 style="font-weight:900;color:#b721ff;text-align:center;margin-top:62px;">Marketplace Preview</h2>
+    <div class="market-section">
+      <form class="filter-bar" method="get">
+        <select name="fuel">
+          <option value="">Fuel Type</option>
+          {% for f in fuel_options %}
+            <option value="{{ f }}" {{ 'selected' if request.args.get('fuel')==f else '' }}>{{ f.title() }}</option>
+          {% endfor %}
+        </select>
+        <select name="transmission">
+          <option value="">Transmission</option>
+          {% for t in transmission_options %}
+            <option value="{{ t }}" {{ 'selected' if request.args.get('transmission')==t else '' }}>{{ t.title() }}</option>
+          {% endfor %}
+        </select>
+        <input type="number" name="min_price" placeholder="Min Price" value="{{ request.args.get('min_price','') }}">
+        <input type="number" name="max_price" placeholder="Max Price" value="{{ request.args.get('max_price','') }}">
+        <input type="text" name="model" placeholder="Model Name" value="{{ request.args.get('model','') }}">
+        <button type="submit" class="model-info-btn" style="background:#56ccf2;color:#fff;">Filter</button>
+      </form>
+      <div class="market-cars-grid">
+        {% for car in cars %}
+        <div class="car-card">
+        {% if car['photo'] %}
+        <img class="car-photo" src="{{ url_for('static', filename='uploads/'+car['photo']) }}" alt="Car photo">
+        {% else %}
+       <div class="car-photo" style="background:#e6e6e6;color:#999;text-align:center;display:flex;align-items:center;justify-content:center;">
+        No Image
+       </div>
+       {% endif %}
+       <div class="car-name">{{ car['car_name'] or 'N/A' }}</div>
+       <div class="car-year">Year: {{ car['year'] or 'N/A' }}</div>
+       <div class="car-preview-details">
+       <strong>Fuel:</strong> {{ car['fuel'] or 'N/A' }}<br>
+       <strong>Transmission:</strong> {{ car['transmission'] or 'N/A' }}<br>
+       <strong>State:</strong> {{ car['registration_state'] or 'N/A' }}<br>
+       <strong>Seller Price:</strong> ₹{{ car['seller_price'] or 'N/A' }}
+       </div>
+          <div class="car-btn-row">
+            <button class="car-btn" onclick="window.location.href='/login'">View More Details</button>
+            <button class="car-btn details" onclick="window.location.href='/login'">Add to Cart</button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <script>
+    // Powerful modal logic for model info
+    const models = [
+      {
+        name: "Image Damage Detection",
+        long: "Our deep learning CNN-based image model analyses uploaded car photos to detect and quantify damage (minor, moderate, severe, etc). This helps both buyers and sellers establish an objective, visual record for each vehicle. Trained on thousands of annotated vehicle images, it recognizes dents, scratches, and structural issues, directly impacting price prediction accuracy and trust."
+      },
+      {
+        name: "Audio Engine Fault Detection",
+        long:
+          "This hybrid model combines Mel-frequency spectral analysis, YAMNet embeddings, and a deep GRU classifier to detect engine health conditions from sound samples. You upload a short engine revving or idle audio. The model distinguishes normal from faulty states (incl. air leak, knocking, bearing faults, oil leaks). Results are used not only for safety but for price reduction calculations and buyer transparency."
+      },
+      {
+        name: "VIN Decoding",
+        long:
+          "VIN decoding is powered by a blend of public API calls and ML logic. Enter your car's VIN, and the platform automatically fetches factory specs, manufacturing country, model variant, trim, equipment, and more. This fast-tracks listing entry, increases accuracy, and ensures car uniqueness within the database."
+      },
+      {
+        name: "Feature-Based Price Prediction",
+        long:
+          "For cars missing image/audio uploads, this module uses features like year, odometer, seller type, fuel type, and registration location to estimate market price. Regression models (Random Forest/XGBoost/Ensemble) are trained on Indian car sales data to deliver a fast, explainable ballpark value."
+      }
+    ];
+    function showInfo(idx) {
+      document.getElementById('modelModal').style.display = 'block';
+      document.getElementById('modelModalTitle').innerText = models[idx].name;
+      document.getElementById('modelModalText').innerText = models[idx].long;
+    }
+    function hideInfo() { document.getElementById('modelModal').style.display = 'none'; }
+  </script>
+</body>
+</html>

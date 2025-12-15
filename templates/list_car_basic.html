@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>List Car - Basic Info</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='css/list_car.css') }}" rel="stylesheet" />
+  <style>
+    .vin-details-card { margin: 15px 0 12px 0; padding: 20px 26px 14px 26px; background: linear-gradient(90deg,#e8f9fe 80%,#ffeec5 120%); border-radius: 15px; border: 2.2px solid #ffd34c; font-size: 1.06em; color: #12405a; box-shadow: 0 2px 14px #efd37833, 0 1px 8px #caf0f233;}
+    .vin-details-title {font-weight:bold; color:#dda700; margin-bottom:10px; font-size: 1.11em;}
+    .vin-details-label { font-weight:500; color:#389e9e; display:inline-block; min-width:110px; }
+    .vin-details-value { font-weight:600; color:#20507f; margin-left:6px; }
+    .vin-details-card .row div { margin-bottom: 3px; }
+    .nav-pipeline-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      width: 100%;
+      gap: 36px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      margin-top: 12px;
+    }
+    .brand-flex-left {
+      min-width: 170px;
+      display: flex;
+      align-items: flex-end;
+    }
+    .brand-flex-left a {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #468fff;
+      letter-spacing: .5px;
+      text-shadow: 0 1px 12px #d9edff82;
+      text-decoration: none;
+    }
+    .nav-flex-right {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      min-width: 236px;
+      justify-content: flex-end;
+    }
+    .nav-link {
+      color: #42587d;
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+      padding: 0 12px;
+      transition: color 0.16s;
+    }
+    .nav-link:hover { color: #468fff; }
+    .text-danger { color: #ec4d5c !important; }
+    @media (max-width:900px) {
+      .nav-pipeline-row {flex-direction:column;align-items:center;gap:12px;}
+      .brand-flex-left, .nav-flex-right {justify-content:center;width:100%;}
+    }
+
+    .progress-wizard-container {
+      width:100%;
+      text-align:center;
+      margin:0 auto;
+      padding:0 0 6px 0;
+      background:none;
+      position:relative;
+      z-index:2;
+    }
+    .progress-wizard {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:0;
+      width:420px;
+      max-width:94vw;
+      margin:0 auto 9px auto;
+    }
+    .wizard-step {
+      display:flex;flex-direction:column;align-items:center;flex:1;
+      min-width:90px;position:relative;
+    }
+    .step-icon {
+      width:36px;height:36px;border-radius:50%;background:linear-gradient(90deg,#ecf2ff,#ffe6b0 130%);
+      color:#5a7beb;font-weight:900;display:flex;align-items:center;justify-content:center;
+      font-size:1.36em;border:3px solid #c3d6ff;box-shadow:0 4px 20px #f8d9a233;transition:.21s;
+      margin-bottom:2px;
+    }
+    .wizard-step.done .step-icon {
+      background:linear-gradient(90deg,#33ddba 65%,#36c1e0 120%);
+      color:#fff;border-color:#33ddba;
+      animation:pulse .3s;
+    }
+    .wizard-step.current .step-icon {
+      background:linear-gradient(90deg,#4f8bff 65%,#ffd025 120%);
+      color:#fff;border-color:#ffd025;
+      box-shadow:0 4px 14px #86b3f866;
+      font-size:1.45em;
+    }
+    @keyframes pulse {
+      0% {transform:scale(1);}
+      60% {transform:scale(1.18);}
+      100% {transform:scale(1);}
+    }
+    .step-desc {
+      font-size:.98em;font-weight:600;color:#0e395c;text-align:center;line-height:1.18;
+    }
+    .wizard-step.done .step-desc {color: #24bd98;font-weight:700;}
+    .wizard-step.current .step-desc {color:#1e81d6;font-weight:700;}
+    .wizard-bar {
+      width:38px;height:5px;
+      background:linear-gradient(90deg,#e5eafc 70%,#ffe6b0 120%);
+      border-radius:2.5px;margin:0 2px;transition:.26s;
+    }
+    .bar-filled {background:linear-gradient(90deg,#18dcb0 85%,#33b0fc 140%);}
+    .wizard-progress-label {
+      margin:4px auto 3px;font-size:1.08em;font-weight:700;color:#468fff;letter-spacing:.03em;
+    }
+    .wizard-progress-bar-bg{
+      height:7px;
+      background:linear-gradient(90deg,#dfedfa 60%,#ffe6b0 130%);
+      border-radius:5px;width:83vw;max-width:380px;margin:0 auto;
+      overflow:hidden;position:relative;}
+    .wizard-progress-bar-fg{
+      height:7px;background:linear-gradient(90deg,#33beb8 40%,#236afd 100%);
+      border-radius:5px;width:10%;transition:width .3s;}
+  </style>
+</head>
+<body>
+<div class="nav-pipeline-row">
+  <div class="brand-flex-left">
+    <a href="/dashboard">Autovaluator</a>
+  </div>
+  <div style="flex:2; min-width:260px;">
+    <div class="progress-wizard-container">
+      <div class="progress-wizard">
+        <div class="wizard-step {% if step > 1 %}done{% elif step == 1 %}current{% endif %}">
+          <div class="step-icon">{% if step > 1 %}<span>&#10003;</span>{% else %}1{% endif %}</div>
+          <div class="step-desc">Basic Info<br><small>{% if step > 1 %}Done{% elif step == 1 %}Current{% else %}Upcoming{% endif %}</small></div>
+        </div>
+        <div class="wizard-bar {% if step > 1 %}bar-filled{% endif %}" ></div>
+        <div class="wizard-step {% if step > 2 %}done{% elif step == 2 %}current{% endif %}">
+          <div class="step-icon">{% if step > 2 %}<span>&#10003;</span>{% else %}2{% endif %}</div>
+          <div class="step-desc">Upload Photo<br><small>{% if step > 2 %}Done{% elif step == 2 %}Current{% else %}Upcoming{% endif %}</small></div>
+        </div>
+        <div class="wizard-bar {% if step > 2 %}bar-filled{% endif %}" ></div>
+        <div class="wizard-step {% if step > 3 %}done{% elif step == 3 %}current{% endif %}">
+          <div class="step-icon">{% if step > 3 %}<span>&#10003;</span>{% else %}3{% endif %}</div>
+          <div class="step-desc">Engine Audio<br><small>{% if step > 3 %}Done{% elif step == 3 %}Current{% else %}Upcoming{% endif %}</small></div>
+        </div>
+        <div class="wizard-bar {% if step > 3 %}bar-filled{% endif %}" ></div>
+        <div class="wizard-step {% if step == 4 %}current{% elif step > 4 %}done{% endif %}">
+          <div class="step-icon">{% if step > 4 %}<span>&#10003;</span>{% else %}4{% endif %}</div>
+          <div class="step-desc">Price Breakdown<br><small>{% if step == 4 %}Current{% elif step > 4 %}Done{% else %}Upcoming{% endif %}</small></div>
+        </div>
+      </div>
+      <div class="wizard-progress-label">{{ step }}/4 steps completed</div>
+      <div class="wizard-progress-bar-bg">
+        <div class="wizard-progress-bar-fg" style="width: {{ (step-1)*33 + 1 }}%;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-flex-right">
+    <a class="nav-link" href="/marketplace">Marketplace</a>
+    <a class="nav-link" href="/cart">My Cart</a>
+    <a class="nav-link" href="/about">About Us</a>
+    <a class="nav-link text-danger" href="/logout">Logout</a>
+  </div>
+</div>
+<div class="main-flex-wrap">
+
+<section class="feature-darkcard">
+    <div class="feature-main-title-in-card">
+      <div class="feature-main-title-line">Chassis <span class="title-vinyellow">VIN</span> Auto-fill</div>
+      <div class="feature-main-title-plus">+</div>
+      <div class="feature-main-title-line">AI Smart Listing</div>
+    </div>
+    <div class="feature-heading-row">
+      <span class="feature-mainiconbox"><span class="feature-mainicon">🚗</span></span>
+    </div>
+    <div class="badges-row">
+      <span class="badge-b">🔐 Auto VIN Decode</span>
+      <span class="badge-b">⚡ AI Feature Suggest</span>
+      <span class="badge-b">✅ Verified Listing</span>
+      <span class="badge-b">📷 Photo VIN Check</span>
+    </div>
+    <div class="featsect-bullets">
+      <ul>
+        <li><span class="list-ico">🏷️</span>
+          Enter or upload a <span class="feature-highlight">VIN/chassis number</span> for instant, robust smart auto-fill of car details.
+        </li>
+        <li><span class="list-ico">🤖</span>
+          <span class="feature-highlight">AI predicts used car price</span> based on fuel type, car name, kilometers driven, year, owner type, location, and more.
+        </li>
+        <li><span class="list-ico">🚀</span>
+          Seamlessly verify, tweak, or accept our intelligent suggestions—save time!
+        </li>
+        <li><span class="list-ico">🛡️</span>
+          Photo <span class="feature-highlight">VIN verification</span> ensures trusted, safe listings every time.
+        </li>
+      </ul>
+      <div class="feature-footnote">
+        <b>Tip:</b> Best results: use dashboard VIN or RC document photo!
+      </div>
+    </div>
+</section>
+
+  <!-- Form -->
+  <div class="big-form-card">
+    <form id="vin-form" autocomplete="off">
+      <div class="vin-input-div mb-3">
+        <div class="row g-2 align-items-end mb-1 vin-top-fields">
+        <div class="col-md-5 col-12">
+          <label for="vin" class="form-label">Chassis Number (VIN)</label>
+        <input type="text" maxlength="17" class="form-control vin-input-short" name="vin" id="vin" placeholder="Enter 17-character VIN" autocomplete="off" />
+        </div>
+       <div class="col-md-5 col-12">
+       <label for="vin_image" class="form-label">Or Upload VIN Image</label>
+       <input type="file" accept="image/*" class="form-control vin-input-short" id="vin_image" name="vin_image" />
+      </div>
+      <div class="col-md-2 col-12 d-grid align-items-end">
+       <label class="form-label invisible">&nbsp;</label>
+       <button type="button" class="btn btn-warning" id="vin-lookup-btn">Auto-fill Details 🚀</button>
+       </div>
+      </div>
+        <div id="vin-status" class="text-success" style="min-height:22px;"></div>
+        <div id="vin-details-box" class="vin-details-card" style="display:none;"></div>
+      </div>
+    </form>
+    <form method="POST" action="/list-car/basic" id="car-basic-form">
+      <div class="row g-3">
+        <!-- [your large block of input fields goes here: car_name, year, km_driven, ... ] -->
+        <!-- (retain your code here unchanged) -->
+        <div class="col-md-4">
+          <label for="car_name" class="form-label">Car Name</label>
+          <input type="text" class="form-control" name="car_name" id="car_name" required />
+        </div>
+        <div class="col-md-4">
+          <label for="year" class="form-label">Year</label>
+          <input type="number" class="form-control" name="year" id="year" required />
+        </div>
+        <div class="col-md-4">
+          <label for="km_driven" class="form-label">Kilometers Driven</label>
+          <input type="number" class="form-control" name="km_driven" id="km_driven" required />
+        </div>
+        <div class="col-md-4">
+          <label for="owner" class="form-label">Owner Type</label>
+          <input type="text" class="form-control" name="owner" id="owner" required />
+        </div>
+        <div class="col-md-4">
+          <label for="fuel" class="form-label">Fuel</label>
+          <select class="form-select" name="fuel" id="fuel" required>
+            <option value="Petrol">Petrol</option>
+            <option value="Diesel">Diesel</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="seller" class="form-label">Seller Type</label>
+          <select class="form-select" name="seller" id="seller" required>
+            <option value="Individual">Individual</option>
+            <option value="Dealer">Dealer</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="transmission" class="form-label">Transmission</label>
+          <select class="form-select" name="transmission" id="transmission" required>
+            <option value="Manual">Manual</option>
+            <option value="Automatic">Automatic</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="location" class="form-label">Location</label>
+          <input type="text" class="form-control" name="location" id="location" required />
+        </div>
+        <div class="col-md-4">
+          <label for="registration_state" class="form-label">Registered State</label>
+          <select class="form-select" name="registration_state" id="registration_state" required>
+            <option value="">-- Select State --</option>
+              <option value="Andhra Pradesh">Andhra Pradesh</option>
+              <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+              <option value="Assam">Assam</option>
+              <option value="Bihar">Bihar</option>
+              <option value="Chhattisgarh">Chhattisgarh</option>
+              <option value="Goa">Goa</option>
+              <option value="Gujarat">Gujarat</option>
+              <option value="Haryana">Haryana</option>
+              <option value="Himachal Pradesh">Himachal Pradesh</option>
+              <option value="Jharkhand">Jharkhand</option>
+              <option value="Karnataka">Karnataka</option>
+              <option value="Kerala">Kerala</option>
+              <option value="Madhya Pradesh">Madhya Pradesh</option>
+              <option value="Maharashtra">Maharashtra</option>
+              <option value="Manipur">Manipur</option>
+              <option value="Meghalaya">Meghalaya</option>
+              <option value="Mizoram">Mizoram</option>
+              <option value="Nagaland">Nagaland</option>
+              <option value="Odisha">Odisha</option>
+              <option value="Punjab">Punjab</option>
+              <option value="Rajasthan">Rajasthan</option>
+              <option value="Sikkim">Sikkim</option>
+              <option value="Tamil Nadu">Tamil Nadu</option>
+              <option value="Telangana">Telangana</option>
+              <option value="Tripura">Tripura</option>
+              <option value="Uttar Pradesh">Uttar Pradesh</option>
+              <option value="Uttarakhand">Uttarakhand</option>
+              <option value="West Bengal">West Bengal</option>
+              <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+              <option value="Chandigarh">Chandigarh</option>
+              <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+              <option value="Delhi">Delhi</option>
+              <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+              <option value="Ladakh">Ladakh</option>
+              <option value="Lakshadweep">Lakshadweep</option>
+              <option value="Puducherry">Puducherry</option>
+          </select>
+        </div>
+        <div class="col-md-12">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" name="email" required />
+        </div>
+      </div>
+      <div class="mt-4 d-grid">
+        <button type="submit" class="btn btn-primary">Upload Photo</button>
+      </div>
+      <!-- Hidden VIN JSON details field -->
+      <input type="hidden" id="vin_details_json" name="vin_details_json" />
+    </form>
+  </div>
+</div>
+<script>
+  // VIN lookup: AJAX auto-fill with VIN details display
+  document.getElementById('vin-lookup-btn').addEventListener('click', async function (e) {
+    e.preventDefault();
+    const vinInput = document.getElementById('vin');
+    const vinImageInput = document.getElementById('vin_image');
+    const statusDiv = document.getElementById('vin-status');
+    const detailsBox = document.getElementById('vin-details-box');
+    statusDiv.textContent = "Analyzing VIN/chassis details...";
+    detailsBox.style.display = "none"; // hide initially
+
+    let formData = new FormData();
+    if (vinImageInput.files.length > 0) {
+      formData.append('vin_image', vinImageInput.files[0]);
+    } else {
+      formData.append('vin', vinInput.value.trim());
+    }
+
+    fetch('/vin-lookup', {
+      method: 'POST',
+      body: formData
+    })
+    .then(async r => {
+      if (!r.ok) throw new Error(await r.text());
+      return r.json();
+    })
+    .then(data => {
+      if (data.success) {
+        document.getElementById('car_name').value = data.car_name || '';
+        document.getElementById('year').value = data.year || '';
+        document.getElementById('fuel').value = data.fuel || '';
+        document.getElementById('transmission').value = data.transmission || '';
+        document.getElementById('registration_state').value = data.registration_state || '';
+        // Populate AI fields
+        fetch('/api/model-feature-suggest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            car_name: data.car_name,
+            year: data.year,
+            fuel: data.fuel,
+            transmission: data.transmission
+          })
+        })
+        .then(resp => resp.json())
+        .then(suggest => {
+          if (suggest.success) {
+            if (suggest.km_driven) document.getElementById('km_driven').value = suggest.km_driven;
+            if (suggest.owner) document.getElementById('owner').value = suggest.owner;
+            if (suggest.seller) document.getElementById('seller').value = suggest.seller;
+            if (suggest.location) document.getElementById('location').value = suggest.location;
+          }
+          statusDiv.textContent = "✔ All available details auto-filled! Please verify or complete as needed.";
+          statusDiv.className = "text-success";
+        })
+        .catch(()=>{
+          statusDiv.textContent = "✔ Basic details filled from VIN. Please complete the form.";
+          statusDiv.className="text-warning";
+        });
+
+        let html = `<div class="vin-details-title">VIN Details</div><div class="row">` +
+          [
+            ['VIN', data.vin], ['Manufacturer', data.car_name], ['Year', data.year], ['Model', data.model],
+            ['Make', data.make], ['Series', data.series], ['Vehicle Type', data.vehicle_type], ['Trim', data.trim],
+            ['Body Class', data.body_class], ['Fuel Type', data.fuel], ['Transmission', data.transmission], 
+            ['Engine Model', data.engine_model], ['Engine Cylinders', data.engine_cylinders], ['Drive Type', data.drive_type],
+            ['Plant Country', data.plant_country], ['Plant City', data.plant_city], ['Displacement (cc)', data.engine_displacement_cc],
+            ['Airbags', data.air_bags]
+          ].filter(([label, val]) => val && val.length > 0)
+           .map(([label, val]) => `<div><span class="vin-details-label">${label}:</span><span class="vin-details-value">${val}</span></div>`).join('') +
+          `</div>`;
+        detailsBox.innerHTML = html;
+        detailsBox.style.display = "block";
+
+        document.getElementById('vin_details_json').value = JSON.stringify(data);
+
+      } else {
+        detailsBox.style.display = "none";
+        statusDiv.textContent = data.error || 'VIN lookup failed.';
+        statusDiv.className = "text-danger";
+      }
+    })
+    .catch(err => {
+      detailsBox.style.display = "none";
+      statusDiv.textContent = "Error: " + err.message;
+      statusDiv.className = "text-danger";
+    });
+  });
+
+
+  document.getElementById('car-basic-form').addEventListener('submit', function(e) {
+    var vinJsonField = document.getElementById('vin_details_json');
+    if (!vinJsonField.value) {
+      vinJsonField.value = "";
+    }
+  });
+</script>
+</body>
+</html>

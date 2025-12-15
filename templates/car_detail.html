@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ car.car_name }} Details - AutoValuator</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='css/car_detail.css') }}" rel="stylesheet" />
+    <style>
+    .carousel-arrow-btn {
+      background: rgba(250,250,250,0.6);
+      border-radius: 50%;
+      border: none;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+      width: 50px;
+      height: 50px;
+      opacity: 0.96;
+      transition: background .2s;
+      box-shadow: 0 0 10px #3332;
+    }
+    .carousel-arrow-btn:focus { outline: 2px solid #076AAF; }
+    .carousel-arrow-btn.left { left: 10px; }
+    .carousel-arrow-btn.right { right: 10px; }
+    .carousel-control-prev-icon, .carousel-control-next-icon {
+      width: 2.25rem; height: 2.25rem;
+      filter: drop-shadow(0 0 2px #000b);
+    }
+    .zoom-img-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 540px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    /* The zoomed image pane */
+    #zoomResult {
+      position: absolute;
+      display: none;
+      left: 100%;
+      top: 0;
+      width: 320px;
+      height: 240px;
+      border: 2px solid #23b9d8;
+      box-shadow: 1px 8px 22px #24e6f338;
+      z-index: 40;
+      background: #fff;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    @media (max-width: 998px) {
+      #zoomResult { display: none!important; }
+    }
+  </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg bg-light border-bottom shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-primary" href="/dashboard">AutoValuator</a>
+    <div class="collapse navbar-collapse justify-content-end">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="/marketplace">Marketplace</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about">About Us</a></li>
+        <li class="nav-item"><a class="nav-link text-danger" href="/logout">Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Car Detail Section -->
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card">
+
+        <!-- IMAGE CAROUSEL WITH ZOOM -->
+        <div class="zoom-img-wrap mt-4" style="max-width:540px;">
+          <div id="carPhotoCarousel" class="carousel slide" data-bs-ride="carousel" style="max-width:540px; margin:auto;">
+            <div class="carousel-inner">
+              {% set active = "active" %}
+              {% for img in car.images %}
+                <div class="carousel-item {{ active }}">
+                  <img src="{{ url_for('static', filename='uploads/' ~ img['photo']) }}"
+                       class="d-block mx-auto img-fluid zoomable-image"
+                       alt="Car Image"
+                       data-large="{{ url_for('static', filename='uploads/' ~ img['photo']) }}"
+                       style="max-height:320px;object-fit:contain;">
+                  {% if img.damage_status %}
+                  <div class="carousel-caption d-none d-md-block">
+                    <span class="badge
+                      {% if img.damage_status.lower() == 'severe' %}bg-danger
+                      {% elif img.damage_status.lower() == 'moderate' %}bg-warning text-dark
+                      {% elif img.damage_status.lower() == 'minor' %}bg-success
+                      {% else %}bg-secondary{% endif %}"
+                    >Damage: {{ img.damage_status|title }}</span>
+                  </div>
+                  {% endif %}
+                </div>
+                {% set active = "" %}
+              {% endfor %}
+              {% if car.images|length == 0 %}
+                <div class="carousel-item active">
+                  <img src="{{ url_for('static', filename='uploads/default.jpg') }}"
+                       class="d-block mx-auto img-fluid" alt="No image"
+                       style="max-height:320px;object-fit:contain;">
+                </div>
+              {% endif %}
+            </div>
+            {% if car.images|length > 1 %}
+            <button type="button" class="carousel-arrow-btn left carousel-control-prev" data-bs-target="#carPhotoCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button type="button" class="carousel-arrow-btn right carousel-control-next" data-bs-target="#carPhotoCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+            <div class="carousel-indicators">
+              {% for i in range(car.images|length) %}
+                <button type="button" data-bs-target="#carPhotoCarousel" data-bs-slide-to="{{ i }}"
+                  class="{% if i == 0 %}active{% endif %}" aria-current="{% if i == 0 %}true{% else %}false{% endif %}" aria-label="Slide {{ i+1 }}"></button>
+              {% endfor %}
+            </div>
+            {% endif %}
+            <!-- The zoom result pane (only on large screens) -->
+            <div id="zoomResult"></div>
+          </div>
+        </div>
+        <!-- END CAROUSEL/ZOOM -->
+
+        <div class="card-body p-4">
+          <h3 class="mb-3">{{ car.car_name }} - {{ car.year }}</h3>
+
+          <!-- Tubular Price Comparison -->
+          <div class="price-tube-card">
+            <div class="tube">
+              <div class="tube-label">Predicted Price</div>
+              <div class="tube-price">₹{{ car.predicted_price or 'N/A' }}</div>
+            </div>
+            <div class="vs-circle-card">vs</div>
+            <div class="tube">
+              <div class="tube-label">2025 Market Price</div>
+              <div class="tube-price">₹{{ current_price_2025 or 'N/A' }}</div>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6"><span class="detail-label">Fuel Type:</span> <span class="detail-value">{{ car.fuel or 'Unknown' }}</span></div>
+            <div class="col-md-6"><span class="detail-label">Transmission:</span> <span class="detail-value">{{ car.transmission or 'Unknown' }}</span></div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6"><span class="detail-label">Kilometers Driven:</span> <span class="detail-value">{{ car.km_driven }}</span></div>
+            <div class="col-md-6"><span class="detail-label">Owner Type:</span> <span class="detail-value">{{ car.owner }}</span></div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6"><span class="detail-label">Seller Type:</span> <span class="detail-value">{{ car.seller }}</span></div>
+            <div class="col-md-6"><span class="detail-label">Location:</span> <span class="detail-value">{{ car.location }}</span></div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6"><span class="detail-label">Registered State:</span> <span class="detail-value">{{ car.registration_state or 'Not Available' }}</span></div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6"><span class="detail-label">AI Predicted Price:</span> <span class="detail-value text-success">₹{{ car.predicted_price }}</span></div>
+            <div class="col-md-6"><span class="detail-label">Seller's Price:</span> <span class="detail-value text-primary">₹{{ car.seller_price }}</span></div>
+          </div>
+
+          <div class="mb-3"><span class="detail-label">Damage Assessment:</span> <span class="detail-value">{{ car.damage_status or 'Not Available' }}</span></div>
+          <div class="mb-3"><span class="detail-label">Engine Condition:</span> <span class="detail-value">{{ car.engine_condition or 'Unknown' }}</span></div>
+
+          {% if car.cleaned_audio %}
+          <div class="mb-3 mt-4">
+            <label class="detail-label fw-bold">Engine Audio (Preprocessed):</label>
+            <audio controls class="w-100" style="max-width: 600px;">
+              <source src="{{ url_for('static', filename='uploads/' ~ car.cleaned_audio) }}" type="audio/wav" />
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+          {% endif %}
+
+         {% if car.vin_details %}
+         <div class="vin-details-card">
+           <div class="vin-details-title">
+             <span class="vin-icon">🚘</span> VIN Details
+           </div>
+         <table class="vin-details-table">
+          <tbody>
+          {% for label, key in [
+            ('VIN', 'vin'),
+            ('Manufacturer', 'car_name'),
+            ('Year', 'year'),
+            ('Model', 'model'),
+            ('Make', 'make'),
+            ('Series', 'series'),
+            ('Vehicle Type', 'vehicle_type'),
+            ('Trim', 'trim'),
+            ('Body Class', 'body_class'),
+            ('Fuel Type', 'fuel'),
+            ('Transmission', 'transmission'),
+            ('Engine Model', 'engine_model'),
+            ('Engine Cylinders', 'engine_cylinders'),
+            ('Drive Type', 'drive_type'),
+            ('Plant Country', 'plant_country'),
+            ('Plant City', 'plant_city'),
+            ('Displacement (cc)', 'engine_displacement_cc'),
+            ('Airbags', 'air_bags')
+           ] %}
+           {% if car.vin_details[key] %}
+            <tr>
+             <th>{{ label }}</th>
+              <td>{{ car.vin_details[key] }}</td>
+             </tr>
+            {% endif %}
+            {% endfor %}
+             </tbody>
+           </table>
+         </div>
+         {% endif %}
+
+          <div class="action-buttons mt-4 d-flex gap-3">
+            <a href="mailto:{{ car.email }}" class="btn btn-contact flex-fill">💌 Contact Seller</a>
+            <form method="POST" action="{{ url_for('remove_from_cart', car_id=car.id) if in_cart else url_for('add_to_cart', car_id=car.id) }}" class="flex-fill">
+              <button type="submit" class="btn {{ 'btn-danger' if in_cart else 'btn-warning text-white' }} w-100">
+                {{ '🗑 Remove from Cart' if in_cart else '🛒 Add to Cart' }}
+              </button>
+            </form>
+          </div>
+
+          <div class="text-center mt-4">
+            <a href="/marketplace" class="btn btn-back">← Back to Marketplace</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  © 2025 AutoValuator — Multimodal Approach for Car Price Evaluation.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Zoom on hover (desktop only)
+const zoomTarget = document.getElementById('zoomResult');
+document.querySelectorAll('.zoomable-image').forEach(img => {
+  img.onmouseenter = function(e){
+    // Reset and show zoomResult
+    zoomTarget.style.display = 'block';
+    zoomTarget.style.backgroundImage = `url('${img.dataset.large}')`;
+    zoomTarget.style.left = (img.offsetWidth + 24) + 'px';
+    zoomTarget.style.top = (img.offsetTop - 8) + 'px';
+  };
+  img.onmousemove = function(e){
+    const rect = img.getBoundingClientRect();
+    const x = e.clientX - rect.left; // Mouse X
+    const y = e.clientY - rect.top;  // Mouse Y
+    // Show zoomed-in 2x section under cursor
+    const xPercent = x / img.width * 100;
+    const yPercent = y / img.height * 100;
+    zoomTarget.style.backgroundPosition = `${xPercent}% ${yPercent}%`;
+    zoomTarget.style.backgroundRepeat = "no-repeat";
+    zoomTarget.style.backgroundSize = `${img.width*2}px ${img.height*2}px`;
+  };
+  img.onmouseleave = function(e){
+    zoomTarget.style.display = 'none';
+  };
+});
+</script>
+</body>
+</html>
